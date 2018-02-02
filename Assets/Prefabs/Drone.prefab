@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 114179522172861268}
   m_Layer: 0
   m_Name: Drone
-  m_TagString: Untagged
+  m_TagString: Agent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -146,7 +146,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1042205097382090}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 312.63293, y: 6.57, z: 330.76022}
+  m_LocalPosition: {x: 333.13803, y: 6.601555, z: -150.21075}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4134030873210970}
@@ -297,7 +297,7 @@ BoxCollider:
   m_GameObject: {fileID: 1322631300199540}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -317,6 +317,7 @@ MonoBehaviour:
   a: {x: 0, y: 0, z: 0}
   world: {fileID: 0}
   conf: {fileID: 0}
+  text: {fileID: 0}
 --- !u!135 &135469875622162658
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -324,10 +325,10 @@ SphereCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1042205097382090}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.75
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &135913040858093880
 SphereCollider:
@@ -337,7 +338,7 @@ SphereCollider:
   m_GameObject: {fileID: 1446978078318052}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -349,7 +350,7 @@ SphereCollider:
   m_GameObject: {fileID: 1689560928468790}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}

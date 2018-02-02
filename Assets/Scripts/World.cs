@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class World : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class World : MonoBehaviour
     public float bound;
     public float spawnR;
     public bool debugWonder = false;
+    public Text text;
 
     //In fact are player variables
     public float hightPlayer;
@@ -21,7 +23,7 @@ public class World : MonoBehaviour
 	{
         agents = new List<Agent>();
 	    spawn(agentPrefab, nAgents);
-
+	    text.text = nAgents.ToString();
         agents.AddRange(FindObjectsOfType<Agent>());
     }
 

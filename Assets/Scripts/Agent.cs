@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Agent : MonoBehaviour
 {
@@ -14,7 +17,7 @@ public class Agent : MonoBehaviour
     private Vector3 wanderTarget;
     private GameObject debugWanderCube;
     private GameObject player;
-    private bool isCollideTerrain = false;
+    public Text text;
 
     void Start ()
     {
@@ -23,52 +26,91 @@ public class Agent : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         x = transform.position;
         v = new Vector3(Random.Range(-3, 3), Random.Range(-3, 3), Random.Range(-3, 3));
-
-        if(world.debugWonder) debugWanderCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        text = world.text;
+        if (world.debugWonder) debugWanderCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
     }
 	
 	void Update ()
 	{
-	    float t = Time.deltaTime;
+        if(crash() == false) { 
+	        float t = Time.deltaTime;
 
-	    a = combine();
-	    a = Vector3.ClampMagnitude(a, conf.maxA);
+	        a = combine();
+	        a = Vector3.ClampMagnitude(a, conf.maxA);
 
-	    v = v + a * t;
-	    v = Vector3.ClampMagnitude(v, conf.maxV);
+	        v = v + a * t;
+	        v = Vector3.ClampMagnitude(v, conf.maxV);
 
-        x = x + v * t;
+            x = x + v * t;
 
-       // wrapArround(ref x, -world.bound, world.bound);
+           // wrapArround(ref x, -world.bound, world.bound);
 
-	    if (world.debugWonder == false)
-	    {
-	        transform.position = x;
-
-	        if (v.magnitude > 0)
+	        if (world.debugWonder == false)
 	        {
-	            transform.LookAt(player.transform.position);
+	            transform.position = x;
+
+	            if (v.magnitude > 0)
+	            {
+	                transform.LookAt(player.transform.position);
+	            }
 	        }
-	    }
+        }
 
-	}
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.name.Equals("Terrain"))
-        {
-            isCollideTerrain = true;
-        };
     }
 
-    void OnTriggerExit(Collider other)
+    bool crash()
     {
-        if (other.gameObject.name.Equals("Terrain"))
+        bool crash = false;
+        Ray ray = new Ray(this.x, Vector3.Normalize(v));
+        crash = checkRayCrash(ray);
+        if (crash == false)
         {
-            isCollideTerrain = false;
-        };
+            ray = new Ray(this.x, new Vector3(1, 0, 0));
+            crash = checkRayCrash(ray);
+        }
+        if (crash == false)
+        {
+            ray = new Ray(this.x, new Vector3(0, 1, 0));
+            crash = checkRayCrash(ray);
+        }
+        if (crash == false)
+        {
+            ray = new Ray(this.x, new Vector3(0, 0, 1));
+            crash = checkRayCrash(ray);
+        }
+        if (crash == false)
+        {
+            ray = new Ray(this.x, new Vector3(-1, 0, 0));
+            crash = checkRayCrash(ray);
+        }
+        if (crash == false)
+        {
+            ray = new Ray(this.x, new Vector3(0, -1, 0));
+            crash = checkRayCrash(ray);
+        }
+        if (crash == false)
+        {
+            ray = new Ray(this.x, new Vector3(0, 0, -1));
+            crash = checkRayCrash(ray);
+        }
+
+        return crash;
     }
 
+    bool checkRayCrash(Ray ray)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 0.01f))
+        {
+            if (hit.collider.gameObject.tag.Equals("Agent") == false)
+            {
+                text.text = (Int32.Parse(text.text) - 1).ToString();
+                Destroy(gameObject);
+                return true;
+            }
+        }
+        return false;
+    }
     Vector3 cohesion()
     {
         Vector3 r = new Vector3();
@@ -223,16 +265,19 @@ public class Agent : MonoBehaviour
 
     Vector3 avoidObstacle()
     {
-        if (isCollideTerrain == false)
-        {
-            return Vector3.zero;
-        }
         Vector3 r = new Vector3();
+        Ray ray = new Ray(this.x, Vector3.Normalize(v));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, conf.Ravoid))
+        {
+            if (hit.collider.gameObject.tag.Equals("Agent") == false)
+            {
+                r += flee(hit.collider.gameObject.transform.position);
+                return r.normalized;
+            }
+        }
 
-       
-        r += flee(x+v);
- 
-        return r.normalized;
+        return Vector3.zero;
     }
 
     Vector3 flee(Vector3 target)
@@ -260,9 +305,8 @@ public class Agent : MonoBehaviour
     Vector3 riseUp()
     {
         Vector3 postitionPlayer = player.transform.position;
-        postitionPlayer.y += world.minimunHight;
 
-        if ((this.x.y - postitionPlayer.y) < world.minimunHight)
+        if ((postitionPlayer.y + world.minimunHight) > this.x.y)
         {
             return new Vector3(0, 1, 0);
         }
