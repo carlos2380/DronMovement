@@ -57,11 +57,19 @@ public class Agent : MonoBehaviour
         }
 
     }
+    void OnCollisionEnter(Collision collision)
+          {
+                if (collision.gameObject.tag.Equals("Agent") == false)
+                  {
+                       text.text = (Int32.Parse(text.text) - 1).ToString();
+                      Destroy(gameObject);
+                    }
+         }
 
     bool crash()
     {
         bool crash = false;
-        Ray ray = new Ray(this.x, Vector3.Normalize(v));
+        Ray ray = new Ray(this.x, v.normalized);
         crash = checkRayCrash(ray);
         if (crash == false)
         {
@@ -265,21 +273,82 @@ public class Agent : MonoBehaviour
 
     Vector3 avoidObstacle()
     {
+        bool existObstacle = false;
+        Vector3 W = new Vector3();
+        Ray ray = new Ray(this.x, v.normalized);
+        checkObstacles(ray, ref W, ref existObstacle);
         Vector3 r = new Vector3();
-        Ray ray = new Ray(this.x, Vector3.Normalize(v));
+        ray = new Ray(this.x, new Vector3(0, 0, 1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(0, 1, 0));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(0, 1, 1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(1, 0, 0));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(1, 0, 1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(1, 1, 0));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(1, 1, 1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(0, 0, -1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(0, -1, 0));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(0, -1, -1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(-1, 0, 0));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(-1, 0, -1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(-1, -1, 0));
+        checkObstacles2(ray, ref r, ref existObstacle);
+        ray = new Ray(this.x, new Vector3(-1, -1, -1));
+        checkObstacles2(ray, ref r, ref existObstacle);
+
+        if (existObstacle == false)
+        {
+            return Vector3.zero;
+        }
+
+        r = r.normalized;
+        W = W.normalized;
+        r = r + W;
+        return r.normalized;
+    }
+
+    void checkObstacles(Ray ray, ref Vector3 r, ref bool existObstacle)
+    {
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, conf.Ravoid))
         {
             if (hit.collider.gameObject.tag.Equals("Agent") == false)
             {
-                r += flee(hit.collider.gameObject.transform.position);
-                return r.normalized;
+                r += flee(hit.point);
+                existObstacle = true;
             }
         }
-
-        return Vector3.zero;
     }
 
+    void checkObstacles2(Ray ray, ref Vector3 r, ref bool existObstacle)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, conf.Ravoid))
+        {
+            if (hit.collider.gameObject.tag.Equals("Agent") == false)
+            {
+                Vector3 towardsMe = this.x - hit.point;
+
+                //if magnitude equals 0 both agents are in the same point
+                if (towardsMe.magnitude > 0)
+                {
+                    //force contribution is inversly proportional to 
+                    r += (towardsMe.normalized / towardsMe.magnitude);
+                }
+            }
+        }
+    }
     Vector3 flee(Vector3 target)
     {
         //Run the oposite direction from target

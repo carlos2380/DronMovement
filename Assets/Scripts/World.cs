@@ -35,7 +35,7 @@ public class World : MonoBehaviour
     {
         for (int i = 0; i < n; ++i)
         {
-            var obj = Instantiate(prefab, new Vector3(Random.Range(-spawnR, spawnR), 0, Random.Range(-spawnR, spawnR)),
+            var obj = Instantiate(prefab, new Vector3(Random.Range(-spawnR, spawnR), 10, Random.Range(-spawnR, spawnR)),
                 Quaternion.identity);
 
         }
